@@ -1,0 +1,124 @@
+-- MySQL Workbench Forward Engineering
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+-- -----------------------------------------------------
+-- Schema Vara-Auto Oy
+-- -----------------------------------------------------
+-- -----------------------------------------------------
+-- Schema Vara-Auto Oy
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `Vara-Auto Oy` DEFAULT CHARACTER SET utf8 ;
+USE `Vara-Auto Oy` ;
+-- -----------------------------------------------------
+-- Table `Vara-Auto Oy`.`Customers_s776193`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Vara-Auto Oy`.`Customers_s776193` ;
+CREATE TABLE IF NOT EXISTS `Vara-Auto Oy`.`Customers_s776193` (
+  `Customer_ID` INT NOT NULL AUTO_INCREMENT,
+  `First_Name` VARCHAR(45) NOT NULL,
+  `Last_Name` VARCHAR(45) NOT NULL,
+  `Phone_Number` INT NOT NULL,
+  `Street_Address` VARCHAR(45) NOT NULL,
+  `Postal_Code` VARCHAR(5) NOT NULL,
+  `City` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Customer_ID`))
+ENGINE = InnoDB;
+-- -----------------------------------------------------
+-- Table `Vara-Auto Oy`.`Cars_s776193`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Vara-Auto Oy`.`Cars_s776193` ;
+CREATE TABLE IF NOT EXISTS `Vara-Auto Oy`.`Cars_s776193` (
+  `Plate_number` VARCHAR(7) NOT NULL,
+  `Company` VARCHAR(45) NOT NULL,
+  `Model` VARCHAR(45) NOT NULL,
+  `Color` VARCHAR(45) NOT NULL,
+  `Year_Model` YEAR(4) NOT NULL,
+  `Fuel` VARCHAR(45) NOT NULL,
+  `Type` VARCHAR(45) NOT NULL,
+  `City` VARCHAR(45) NOT NULL,
+  `Base_Price` DOUBLE NOT NULL,
+  PRIMARY KEY (`Plate_number`))
+ENGINE = InnoDB;
+-- -----------------------------------------------------
+-- Table `Vara-Auto Oy`.`Car_Reservation_s776193`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Vara-Auto Oy`.`Car_Reservation_s776193` ;
+CREATE TABLE IF NOT EXISTS `Vara-Auto Oy`.`Car_Reservation_s776193` (
+  `Res_ID` INT NOT NULL AUTO_INCREMENT,
+  `Customer_ID` INT NOT NULL,
+  `Plate_number` VARCHAR(7) NOT NULL,
+  `Reservation_date` DATE NOT NULL,
+  `Return_date` DATE NOT NULL,
+  `Reservation_Status` ENUM('Reserved', 'Rented', 'Returned') NOT NULL,
+  PRIMARY KEY (`Res_ID`),
+  INDEX `CID_idx` (`Customer_ID` ASC),
+  INDEX `PN_idx` (`Plate_number` ASC),
+  CONSTRAINT `CID`
+    FOREIGN KEY (`Customer_ID`)
+    REFERENCES `Vara-Auto Oy`.`Customers_s776193` (`Customer_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `PN`
+    FOREIGN KEY (`Plate_number`)
+    REFERENCES `Vara-Auto Oy`.`Cars_s776193` (`Plate_number`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+-- -----------------------------------------------------
+-- Table `Vara-Auto Oy`.`Service_s776193`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Vara-Auto Oy`.`Service_s776193` ;
+CREATE TABLE IF NOT EXISTS `Vara-Auto Oy`.`Service_s776193` (
+  `Service_ID` INT NOT NULL AUTO_INCREMENT,
+  `Name` VARCHAR(45) NOT NULL,
+  `Description` VARCHAR(45) NOT NULL,
+  `Price` DOUBLE NOT NULL,
+  PRIMARY KEY (`Service_ID`))
+ENGINE = InnoDB;
+-- -----------------------------------------------------
+-- Table `Vara-Auto Oy`.`Service_Reservation_s776193`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Vara-Auto Oy`.`Service_Reservation_s776193` ;
+
+CREATE TABLE IF NOT EXISTS `Vara-Auto Oy`.`Service_Reservation_s776193` (
+  `Service_ID` INT NOT NULL,
+  `Res_ID` INT NOT NULL,
+  PRIMARY KEY (`Service_ID`, `Res_ID`),
+  INDEX `RID_idx` (`Res_ID` ASC),
+  CONSTRAINT `SID`
+    FOREIGN KEY (`Service_ID`)
+    REFERENCES `Vara-Auto Oy`.`Service_s776193` (`Service_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `RID`
+    FOREIGN KEY (`Res_ID`)
+    REFERENCES `Vara-Auto Oy`.`Car_Reservation_s776193` (`Res_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+-- -----------------------------------------------------
+-- Table `Vara-Auto Oy`.`Payment_s776193`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `Vara-Auto Oy`.`Payment_s776193` ;
+CREATE TABLE IF NOT EXISTS `Vara-Auto Oy`.`Payment_s776193` (
+  `Res_ID` INT NOT NULL,
+  `Customer_ID` INT NOT NULL,
+  `Payment_Method` ENUM('Cash', 'Credit_card') NOT NULL DEFAULT 'Cash',
+  `Payment_Status` ENUM('Paid', 'Unpaid') NOT NULL DEFAULT 'Unpaid',
+  PRIMARY KEY (`Res_ID`, `Customer_ID`),
+  INDEX `CID_idx` (`Customer_ID` ASC),
+  CONSTRAINT `RID2`
+    FOREIGN KEY (`Res_ID`)
+    REFERENCES `Vara-Auto Oy`.`Car_Reservation_s776193` (`Res_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `CID2`
+    FOREIGN KEY (`Customer_ID`)
+    REFERENCES `Vara-Auto Oy`.`Customers_s776193` (`Customer_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
