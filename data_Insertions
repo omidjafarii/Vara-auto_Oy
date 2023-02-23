@@ -1,24 +1,3 @@
--- Invoice view Querry--------------------------------------------------------------------------------------------------------
-CREATE VIEW `Invoice` AS
-SELECT CONCAT(cu.First_Name,' ',cu.Last_Name) AS 'Customer Name',
-       cu.Phone_Number AS 'Phone Number', 
-       cu.Postal_Code, 
-       c.Plate_number AS Car, 
-       c.City AS 'Pickup City', 
-       CR.Res_ID AS 'Reservation_ID', 
-       CR.Reservation_date AS 'From', 
-       CR.Return_date AS 'To',
-       DATEDIFF(CR.Return_date, CR.Reservation_date) AS Duration,
-       c.Base_Price AS 'Price/day',
-       coalesce(`s`.`Name`,'-') AS 'additional Services',
-       coalesce(`s`.`Price`,0) AS 'Service Price',
-       (DATEDIFF(CR.Return_date, CR.Reservation_date) * c.Base_Price + coalesce(`s`.`Price`,0)) AS Total_Price
-FROM Car_Reservation_s776193 CR
-JOIN customers_s776193 cu ON cu.Customer_ID = CR.Customer_ID
-JOIN cars_s776193 c ON c.Plate_number = CR.Plate_number
-left JOIN service_reservation_s776193 SR ON SR.Res_ID = CR.Res_ID
-left JOIN service_s776193 s ON s.Service_ID = SR.Service_ID;
-
 -- Insert data to Customers table----------------------------------------------------------------------------------------------
 
 INSERT INTO customers_s776193(Customer_ID,First_Name,Last_Name,Phone_Number,Street_Address,Postal_Code,City)
