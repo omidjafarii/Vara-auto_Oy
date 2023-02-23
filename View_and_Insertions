@@ -1,0 +1,72 @@
+-- Invoice view Querry--------------------------------------------------------------------------------------------------------
+CREATE VIEW `Invoice` AS
+SELECT CONCAT(cu.First_Name,' ',cu.Last_Name) AS 'Customer Name',
+       cu.Phone_Number AS 'Phone Number', 
+       cu.Postal_Code, 
+       c.Plate_number AS Car, 
+       c.City AS 'Pickup City', 
+       CR.Res_ID AS 'Reservation ID', 
+       CR.Reservation_date AS 'From', 
+       CR.Return_date AS 'To',
+       DATEDIFF(CR.Return_date, CR.Reservation_date) AS Duration,
+       c.Base_Price AS 'Price/day',
+       coalesce(`s`.`Name`,'-') AS 'additional Services',
+       coalesce(`s`.`Price`,0) AS 'Service Price',
+       (DATEDIFF(CR.Return_date, CR.Reservation_date) * c.Base_Price + coalesce(`s`.`Price`,0)) AS Total_Price
+FROM Car_Reservation_s776193 CR
+JOIN customers_s776193 cu ON cu.Customer_ID = CR.Customer_ID
+JOIN cars_s776193 c ON c.Plate_number = CR.Plate_number
+left JOIN service_reservation_s776193 SR ON SR.Res_ID = CR.Res_ID
+left JOIN service_s776193 s ON s.Service_ID = SR.Service_ID;
+
+-- Insert data to Customers table----------------------------------------------------------------------------------------------
+
+INSERT INTO customers_s776193(Customer_ID,First_Name,Last_Name,Phone_Number,Street_Address,Postal_Code,City)
+VALUES (1001,'Emma','Wilson','0401234567','Main Street 123','00100','Helsinki');
+INSERT INTO customers_s776193(First_Name,Last_Name,Phone_Number,Street_Address,Postal_Code,City)
+VALUES ('Markus','Niemi','0507654321','Mannerheimintie 1','00100','Helsinki');
+INSERT INTO customers_s776193(First_Name,Last_Name,Phone_Number,Street_Address,Postal_Code,City)
+VALUES ('Anna','Korhonen','0405556667','Koulukatu 10','33100','Tampere');
+
+-- Insert data to Cars table---------------------------------------------------------------------------------------------------
+
+INSERT INTO cars_s776193 (Plate_number, Company, Model, Color, Year_Model, Fuel, Type, City, Base_Price)
+VALUES ('ABC-123', 'Toyota', 'Camry', 'Blue', 2015, 'Gasoline', 'Sedan', 'Helsinki', 50.00);
+INSERT INTO cars_s776193 (Plate_number, Company, Model, Color, Year_Model, Fuel, Type, City, Base_Price)
+VALUES ('XYZ-789', 'Honda', 'Civic', 'Red', 2018, 'Gasoline', 'Hatchback', 'Tampere', 60.00);
+INSERT INTO cars_s776193 (Plate_number, Company, Model, Color, Year_Model, Fuel, Type, City, Base_Price)
+VALUES ('DEF-456', 'Nissan', 'Altima', 'Black', 2017, 'Gasoline', 'Sedan', 'Turku', 55.00);
+
+-- Insert data to service table------------------------------------------------------------------------------------------------
+
+INSERT INTO service_s776193 (Service_ID, Name, Description, Price)
+VALUES (1, 'GPS Navigator', 'Satellite navigation system', 10.00);
+INSERT INTO service_s776193 (Service_ID, Name, Description, Price)
+VALUES (2, 'Child Seat', 'Safety seat for children', 5.00);
+INSERT INTO service_s776193 (Service_ID, Name, Description, Price)
+VALUES (3, 'Tow Hitch', 'Trailer hitch for towing', 20.00);
+
+-- Insert data to Car_reservation table----------------------------------------------------------------------------------------
+
+INSERT INTO car_reservation_s776193 (Res_ID, Customer_ID, Plate_number, Reservation_date, Return_date, Reservation_Status) 
+VALUES
+(100, 1002, 'ABC-123', '2023-03-01', '2023-03-05', 'Reserved'),
+(101, 1001, 'DEF-456', '2023-03-07', '2023-03-09', 'Reserved'),
+(102, 1003, 'XYZ-789', '2023-03-12', '2023-03-17', 'Rented');
+
+-- Insert data to service_reservation table-------------------------------------------------------------------------------------
+
+INSERT INTO service_reservation_s776193 (Res_ID, Service_ID) 
+VALUES (100, 2),
+(102,3);
+
+-- Insert data to Payment table-------------------------------------------------------------------------------------------------
+
+INSERT INTO payment_s776193 (Res_ID, Customer_ID, Payment_Method, Payment_Status) 
+VALUES
+(100, 1002, 'Credit_card', 'Paid'),
+(101, 1001, 'Credit_card', 'Unpaid');
+INSERT INTO payment_s776193 (Res_ID, Customer_ID) 
+VALUES(102, 1003);
+
+
