@@ -5,7 +5,7 @@ SELECT CONCAT(cu.First_Name,' ',cu.Last_Name) AS 'Customer Name',
        cu.Postal_Code, 
        c.Plate_number AS Car, 
        c.City AS 'Pickup City', 
-       CR.Res_ID AS 'Reservation ID', 
+       CR.Res_ID AS 'Reservation_ID', 
        CR.Reservation_date AS 'From', 
        CR.Return_date AS 'To',
        DATEDIFF(CR.Return_date, CR.Reservation_date) AS Duration,
@@ -68,5 +68,3 @@ VALUES
 (101, 1001, 'Credit_card', 'Unpaid');
 INSERT INTO payment_s776193 (Res_ID, Customer_ID) 
 VALUES(102, 1003);
-
-
